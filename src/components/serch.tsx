@@ -20,52 +20,59 @@ const SearchButton: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [inflectionDataArray, setInflectionDataArray] = useState<any[]>([]);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchArticleById = async (articleId: number) => {
-      try {
-        const articleResponse = await SearchService.getArticleById('bm', articleId.toString(), {});
-        const inflectionData = articleResponse.data.lemmas[0].paradigm_info[0].inflection;
-        const tags = articleResponse.data.lemmas[0]?.paradigm_info[0].tags;
-
-        return inflectionData.map((inflection: any) => ({ ...inflection, tags }));
-      } catch (error) {
-        console.error(`Error fetching article with ID ${articleId}`, error);
-        return [];
-      }
-    };
-
-    const fetchData = async () => {
-      try {
-        const response = await SearchService.getArticles({ w: searchTerm, dict: 'bm', wc: 'NOUN' });
-
-        if (isMounted) {
-          const articleIds = response.data.articles.bm;
-          const fetchedData = await Promise.all(articleIds.map(fetchArticleById));
-
-          const newDataArray = fetchedData.map((inflectionData) =>
-            inflectionData.map((inflection) => ({ ...inflection, tags: inflectionData.tags }))
-          );
-
-          setInflectionDataArray((prevInflectionDataArray) => [...prevInflectionDataArray, ...newDataArray]);
-        }
-      } catch (error) {
-        console.error('Error searching articles:', error);
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [searchTerm]);
+  const searchParams = {
+    w: 'a',
+    dict: 'bm,nn',
+    wc: 'NOUN',
+    include: 's',
+  };
 
   useEffect(() => {
-    if (searchTerm === '') {
-      setInflectionDataArray([]);
+  const fetchData = async () => {
+    try {
+      const response = await SearchService.getArticles({ w: searchTerm, dict: 'bm', wc: 'NOUN' });
+
+      if (response.data.articles.bm.length === 0) {
+        setInflectionDataArray([]);
+      } else {
+        const articleIds = response.data.articles.bm;
+
+        const fetchArticleById = async (articleId: number) => {
+          try {
+            const articleResponse = await SearchService.getArticleById('bm', articleId.toString(), {});
+
+            const inflectionData = articleResponse.data.lemmas[0].paradigm_info[0].inflection;
+            const tags = articleResponse.data.lemmas[0]?.paradigm_info[0].tags;
+
+            // Add tags information to each inflection object
+            const inflectionDataWithTag = inflectionData.map((inflection: any) => ({
+              ...inflection,
+              tags,
+            }));
+
+            setInflectionDataArray((prevInflectionDataArray) => [
+              ...prevInflectionDataArray,
+              inflectionDataWithTag,
+            ]);
+          } catch (error) {
+            console.error(`Error fetching article with ID ${articleId}`, error);
+          }
+        };
+
+        // Use Promise.all to concurrently fetch articles by ID
+        await Promise.all(articleIds.map(fetchArticleById));
+      }
+    } catch (error) {
+      console.error('Error searching articles:', error);
     }
+  };
+
+  fetchData(); // Call the asynchronous function
+}, [searchTerm, setInflectionDataArray]); // Add setInflectionDataArray to the dependency array
+
+
+  useEffect(() => {
+    searchTerm === '' && setInflectionDataArray([]);
   }, [searchTerm]);
 
   return (

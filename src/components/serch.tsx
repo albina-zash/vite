@@ -20,13 +20,6 @@ const SearchButton: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [inflectionDataArray, setInflectionDataArray] = useState<any[]>([]);
 
-  const searchParams = {
-    w: 'a',
-    dict: 'bm,nn',
-    wc: 'NOUN',
-    include: 's',
-  };
-
   useEffect(() => {
   const fetchData = async () => {
     try {

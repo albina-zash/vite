@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/', // Adjust this based on your deployment environment
+  base: 'https://albina-zash.github.io/', // Adjust this based on your deployment environment
 });

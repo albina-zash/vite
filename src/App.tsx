@@ -6,7 +6,8 @@ function App() {
   
   return (
     <React.Fragment>
-      <div className="w-100">
+      <div className="w-100 d-grid">
+        <h2>Skriv inn et substantiv og få bøyning</h2>
         <SearchButton/>
       </div>
     </React.Fragment>

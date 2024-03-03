@@ -24,6 +24,7 @@ const SearchButton: React.FC = () => {
   const fetchData = async () => {
     try {
       const response = await SearchService.getArticles({ w: searchTerm, dict: 'bm', wc: 'NOUN' });
+      setInflectionDataArray([]);
 
       if (response.data.articles.bm.length === 0) {
         setInflectionDataArray([]);
@@ -69,7 +70,7 @@ const SearchButton: React.FC = () => {
   }, [searchTerm]);
 
   return (
-    <div className="container mt-3" style={{ width: 600 }}>
+    <div className="container mt-3" style={{ maxWidth: 600 }}>
       <input
         type="text"
         className="form-control mb-3"

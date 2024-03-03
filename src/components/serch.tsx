@@ -23,7 +23,7 @@ const SearchButton: React.FC = () => {
   useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await SearchService.getArticles({ w: searchTerm, dict: 'bm', wc: 'NOUN' });
+      const response = await SearchService.getArticles({ w: searchTerm.toLowerCase(), dict: 'bm', wc: 'NOUN' });
       setInflectionDataArray([]);
 
       if (response.data.articles.bm.length === 0) {
